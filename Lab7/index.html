@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Lab 7 mở rộng - Computer Vision Model Zoo for AIoT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #162033; }
+    header { background: #153a5b; color: white; padding: 16px 24px; }
+    h1 { margin: 0; font-size: 22px; }
+    .subtitle { opacity: .9; margin-top: 6px; }
+    main { padding: 18px; display: grid; grid-template-columns: 360px 1fr; gap: 16px; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); padding: 16px; }
+    label { display: block; margin-top: 10px; font-weight: bold; font-size: 13px; }
+    select, input, button { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #c6d0db; margin-top: 4px; box-sizing: border-box; }
+    button { background: #1769aa; color: white; font-weight: bold; cursor: pointer; border: none; margin-top: 12px; }
+    button.secondary { background: #52616f; }
+    button.warning { background: #b45309; }
+    #stream { width: 100%; max-height: 70vh; object-fit: contain; background: #111; border-radius: 12px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .hint { background: #eef6ff; border-left: 4px solid #1769aa; padding: 10px; margin-top: 12px; font-size: 14px; line-height: 1.45; }
+    pre { white-space: pre-wrap; background: #111827; color: #d1fae5; padding: 12px; border-radius: 8px; max-height: 260px; overflow: auto; }
+    .result-img { width: 100%; border-radius: 12px; border: 1px solid #d9e2ec; background: #f8fafc; }
+    .badge { display: inline-block; background: #e2e8f0; border-radius: 999px; padding: 4px 10px; margin: 2px; font-size: 12px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Lab 7 mở rộng: Computer Vision Model Zoo for AIoT</h1>
+  <div class="subtitle">Trải nghiệm nhiều nhóm mô hình thị giác: Detection, Tracking, Pose, Hand/Gesture, Face, OCR, Segmentation, Motion.</div>
+</header>
+<main>
+  <section class="card">
+    <h2>1. Chọn trạm trải nghiệm</h2>
+    <label>Task</label>
+    <select id="task" onchange="updateHint()">
+      <option value="detection">Object Detection - YOLO / bbox</option>
+      <option value="tracking_counting">Tracking & Counting</option>
+      <option value="pose_landmark">Pose Landmark</option>
+      <option value="hand_gesture">Hand / Gesture</option>
+      <option value="face_landmark">Face Landmark</option>
+      <option value="ocr">OCR - đọc chữ</option>
+      <option value="segmentation">Segmentation - tách vùng</option>
+      <option value="opencv_motion">OpenCV Motion baseline</option>
+    </select>
+
+    <label>Nguồn camera</label>
+    <input id="source" value="0" />
+    <div class="hint">Dùng <b>0</b> cho camera laptop. Có thể nhập URL IP camera nếu có. Nếu camera lỗi, backend sẽ dùng stream mô phỏng.</div>
+
+    <label>Confidence / ngưỡng demo</label>
+    <input id="conf" type="number" step="0.05" min="0.05" max="0.95" value="0.35" />
+
+    <label>Detect mỗi N frame</label>
+    <input id="detectEvery" type="number" min="1" max="10" value="3" />
+
+    <label>Lọc class YOLO, cách nhau bằng dấu phẩy</label>
+    <input id="classes" placeholder="person,bottle,cell phone" />
+
+    <label>Model path nếu dùng custom YOLO</label>
+    <input id="modelPath" value="yolov8n.pt" />
+
+    <button onclick="startStream()">Bắt đầu stream</button>
+    <button class="secondary" onclick="stopStream()">Dừng stream</button>
+    <button class="warning" onclick="runSample()">Chạy ảnh mẫu</button>
+
+    <hr />
+    <h3>Upload ảnh để test task hiện tại</h3>
+    <input type="file" id="file" accept="image/*" />
+    <button onclick="uploadRun()">Upload và chạy model</button>
+
+    <div id="taskHint" class="hint"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Quan sát trực tiếp</h2>
+    <img id="stream" alt="video stream" />
+    <div style="margin-top: 10px;">
+      <span class="badge">bbox/class/confidence</span>
+      <span class="badge">landmarks</span>
+      <span class="badge">OCR text</span>
+      <span class="badge">mask/segmentation</span>
+      <span class="badge">event/log</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. Kết quả ảnh upload / ảnh mẫu</h2>
+    <div class="grid2">
+      <div><b>Ảnh kết quả</b><br/><img id="resultImg" class="result-img" /></div>
+      <div><b>JSON output</b><pre id="jsonOut">Chưa có kết quả.</pre></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>4. Log gần nhất</h2>
+    <button onclick="loadLog('model_zoo_event_log.csv')">Xem model_zoo_event_log.csv</button>
+    <button onclick="loadTaskLog()">Xem log của task hiện tại</button>
+    <pre id="logOut">Bấm nút để xem log.</pre>
+  </section>
+</main>
+<script>
+const hints = {
+  detection: "Đưa chai nước, điện thoại, laptop hoặc người lên camera. Quan sát bbox, class và confidence. Thử đổi threshold 0.25 / 0.50 / 0.70.",
+  tracking_counting: "Đưa người hoặc vật đi qua vạch ngang trên màn hình. Quan sát ID đối tượng và số lượt qua vạch. Đây là bước sau object detection.",
+  pose_landmark: "Đứng trước camera, giơ tay, ngồi/cúi người. Quan sát các điểm khớp cơ thể. Dùng cho posture, fitness, fall-review.",
+  hand_gesture: "Giơ bàn tay trước camera. Quan sát các điểm bàn tay và nhãn gesture demo. Dùng cho điều khiển bằng cử chỉ.",
+  face_landmark: "Nhìn vào camera, quay mặt trái/phải, nhắm mắt. Quan sát landmark mặt. Dùng cho attention/drowsiness ở mức gợi ý.",
+  ocr: "Đưa tờ giấy có chữ lớn trước camera hoặc upload ảnh văn bản. Quan sát text và bbox text. Chữ nhỏ/nghiêng/mờ dễ sai.",
+  segmentation: "Upload ảnh có vật thể rõ hoặc dùng stream mô phỏng. Quan sát vùng mask. So sánh mask với bbox.",
+  opencv_motion: "Di chuyển vật trước camera. Quan sát vùng chuyển động. Đây là baseline không dùng deep learning."
+};
+const taskLogs = {
+  detection: 'detection_log.csv', tracking_counting: 'tracking_count_log.csv', pose_landmark: 'pose_log.csv',
+  hand_gesture: 'gesture_log.csv', face_landmark: 'face_log.csv', ocr: 'ocr_log.csv', segmentation: 'segmentation_log.csv', opencv_motion: 'motion_log.csv'
+};
+function task(){ return document.getElementById('task').value; }
+function updateHint(){ document.getElementById('taskHint').innerHTML = hints[task()] || ''; }
+function params(){
+  return new URLSearchParams({
+    task: task(), source: document.getElementById('source').value,
+    conf: document.getElementById('conf').value,
+    detect_every: document.getElementById('detectEvery').value,
+    classes: document.getElementById('classes').value,
+    model_path: document.getElementById('modelPath').value,
+    session_id: String(Date.now())
+  });
+}
+function startStream(){ document.getElementById('stream').src = '/video_feed?' + params().toString(); }
+function stopStream(){ document.getElementById('stream').removeAttribute('src'); }
+async function runSample(){
+  const q = new URLSearchParams({task: task(), conf: document.getElementById('conf').value, classes: document.getElementById('classes').value});
+  const res = await fetch('/run_sample?' + q.toString());
+  const js = await res.json();
+  document.getElementById('jsonOut').textContent = JSON.stringify(js, null, 2);
+  if(js.annotated_image_url) document.getElementById('resultImg').src = js.annotated_image_url + '?t=' + Date.now();
+}
+async function uploadRun(){
+  const f = document.getElementById('file').files[0];
+  if(!f){ alert('Chọn một ảnh trước.'); return; }
+  const fd = new FormData(); fd.append('file', f);
+  const q = new URLSearchParams({task: task(), conf: document.getElementById('conf').value, classes: document.getElementById('classes').value, model_path: document.getElementById('modelPath').value});
+  const res = await fetch('/run_task?' + q.toString(), {method: 'POST', body: fd});
+  const js = await res.json();
+  document.getElementById('jsonOut').textContent = JSON.stringify(js, null, 2);
+  if(js.annotated_image_url) document.getElementById('resultImg').src = js.annotated_image_url + '?t=' + Date.now();
+}
+async function loadLog(name){
+  const res = await fetch('/logs/' + name);
+  const js = await res.json();
+  document.getElementById('logOut').textContent = js.content || js.message || JSON.stringify(js, null, 2);
+}
+function loadTaskLog(){ loadLog(taskLogs[task()] || 'model_zoo_event_log.csv'); }
+updateHint();
+</script>
+</body>
+</html>

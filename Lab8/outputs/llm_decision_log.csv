@@ -1,0 +1,8 @@
+timestamp,context_id,scenario_id,provider,latency_ms,risk_level,control_allowed,need_human_review,validation
+2026-06-16T15:56:31.551971+00:00,c7602a4e-008e-4970-b7d2-24f3d6b13df8,lab_overcrowded_high_co2,mock,0.02,HIGH,False,True,OK
+2026-06-16T15:56:31.555946+00:00,ff67e5fe-9226-4708-b3de-d5ec1c656dab,fire_alarm_conflict,mock,0.02,MEDIUM,False,True,OK
+2026-06-16T15:56:31.562411+00:00,ed4cc41c-0a87-4d85-949e-567a03784aaf,fire_alarm_conflict,mock,0.02,MEDIUM,False,True,OK
+2026-06-21T17:47:09.057669+00:00,1ca81323-4efa-40ea-ba62-0e943a2ebce2,lab_overcrowded_high_co2,mock,0.01,HIGH,False,True,OK
+2026-06-21T17:47:09.060209+00:00,a20b76d4-2716-40aa-8de6-10c2b36a467e,fire_alarm_conflict,mock,0.01,MEDIUM,False,True,OK
+2026-06-21T17:47:09.066514+00:00,76ee0cf6-99cd-405d-8e13-391011639ca3,fire_alarm_conflict,mock,0.02,MEDIUM,False,True,OK
+2026-06-21T17:50:13.195237+00:00,95ee9371-345a-421e-8621-3f2457a0ffdb,lab_overcrowded_high_co2,mock,0.03,HIGH,False,True,OK

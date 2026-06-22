@@ -1,0 +1,7 @@
+ultralytics
+mediapipe
+easyocr
+paddleocr
+supervision
+segment-anything
+open3d

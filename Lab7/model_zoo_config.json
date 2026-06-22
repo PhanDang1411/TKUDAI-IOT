@@ -1,0 +1,55 @@
+{
+  "default_camera_source": "0",
+  "default_confidence": 0.35,
+  "default_detect_every_n_frames": 3,
+  "tasks": [
+    {
+      "id": "detection",
+      "name": "Object Detection - YOLO",
+      "output": "bbox, class, confidence",
+      "try_with_camera": "Đưa chai nước, điện thoại, laptop hoặc người lên camera."
+    },
+    {
+      "id": "tracking_counting",
+      "name": "Tracking & Counting",
+      "output": "object_id, centroid, count_in, count_out",
+      "try_with_camera": "Đưa người hoặc vật đi qua vạch ngang trên màn hình."
+    },
+    {
+      "id": "pose_landmark",
+      "name": "Pose Landmark",
+      "output": "body landmarks",
+      "try_with_camera": "Đứng trước camera, giơ tay, ngồi hoặc cúi người."
+    },
+    {
+      "id": "hand_gesture",
+      "name": "Hand / Gesture",
+      "output": "hand landmarks, gesture label",
+      "try_with_camera": "Giơ bàn tay, tạo cử chỉ thumbs-up, victory, open palm."
+    },
+    {
+      "id": "face_landmark",
+      "name": "Face Landmark",
+      "output": "face landmarks, attention cue",
+      "try_with_camera": "Nhìn vào camera, quay trái/phải, thử nhắm mắt."
+    },
+    {
+      "id": "ocr",
+      "name": "OCR",
+      "output": "text, text box, confidence",
+      "try_with_camera": "Đưa giấy có chữ lớn trước camera hoặc upload ảnh văn bản."
+    },
+    {
+      "id": "segmentation",
+      "name": "Segmentation",
+      "output": "mask, mask area, region bbox",
+      "try_with_camera": "Upload ảnh có vật thể rõ để quan sát vùng mask."
+    },
+    {
+      "id": "opencv_motion",
+      "name": "OpenCV Motion baseline",
+      "output": "motion area, motion bbox",
+      "try_with_camera": "Di chuyển vật trước camera để quan sát vùng thay đổi."
+    }
+  ]
+}

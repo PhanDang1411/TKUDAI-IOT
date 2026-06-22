@@ -1,0 +1,2 @@
+LOCAL_PIPELINE_TEST_PASS
+All model zoo demo tasks ran with fallback-safe engines.

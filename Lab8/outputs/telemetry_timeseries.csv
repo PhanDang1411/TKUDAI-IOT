@@ -1,0 +1,8 @@
+timestamp,scenario_id,step_index,source,co2_ppm,temperature_c,humidity_percent,person_count,vision_confidence,fan,window
+2026-06-16T15:56:31.536038+00:00,lab_overcrowded_high_co2,0,reset,780,27.8,61,8,0.84,OFF,CLOSED
+2026-06-16T15:56:31.542176+00:00,lab_overcrowded_high_co2,1,step,980,28.4,64,18,0.83,OFF,CLOSED
+2026-06-16T15:56:31.545493+00:00,lab_overcrowded_high_co2,1,manual_update,1850.0,28.4,64,35,0.82,OFF,CLOSED
+2026-06-21T17:47:09.043032+00:00,lab_overcrowded_high_co2,0,reset,780,27.8,61,8,0.84,OFF,CLOSED
+2026-06-21T17:47:09.048765+00:00,lab_overcrowded_high_co2,1,step,980,28.4,64,18,0.83,OFF,CLOSED
+2026-06-21T17:47:09.052300+00:00,lab_overcrowded_high_co2,1,manual_update,1850.0,28.4,64,35,0.82,OFF,CLOSED
+2026-06-21T17:50:13.184142+00:00,lab_overcrowded_high_co2,0,reset,780,27.8,61,8,0.84,OFF,CLOSED

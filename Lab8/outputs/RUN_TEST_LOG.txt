@@ -1,0 +1,12 @@
+LOCAL_PIPELINE_TEST_PASS
+('health', True, 200, '{"status":"ok","lab":"Lab 8 v3","time":"2026-06-21T17:47:09.038297+00:00"}')
+('scenarios', True, 200, '[{"scenario_id":"lab_overcrowded_high_co2","title":"Smart classroom: CO2 tăng nhanh + phòng đông người","why":"Cùng một ')
+('reset', True, 200, '{"scenario_id":"lab_overcrowded_high_co2","scenario_title":"Smart classroom: CO2 tăng nhanh + phòng đông người","step_in')
+('state', True, 200, '{"scenario_id":"lab_overcrowded_high_co2","scenario_title":"Smart classroom: CO2 tăng nhanh + phòng đông người","step_in')
+('step', True, 200, '{"scenario_id":"lab_overcrowded_high_co2","scenario_title":"Smart classroom: CO2 tăng nhanh + phòng đông người","step_in')
+('update_sensor', True, 200, '{"scenario_id":"lab_overcrowded_high_co2","scenario_title":"Smart classroom: CO2 tăng nhanh + phòng đông người","step_in')
+('context', True, 200, '{"context_id":"a9c896e4-db9a-486c-8bae-81983ce8c0e3","timestamp":"2026-06-21T17:47:09.054844+00:00","scenario_id":"lab_o')
+('compare_three_levels', True, 200, '{"scenario_id":"lab_overcrowded_high_co2","telemetry":{"co2_ppm":1850.0,"temperature_c":28.4,"humidity_percent":64,"pers')
+('fire_conflict', True, 200, '{"scenario_id":"fire_alarm_conflict","telemetry":{"temperature_c":29.0,"smoke_level":0,"gas_level":0,"flame_vision_confi')
+('baseline_ai', True, 200, '{"layer":"sensor_plus_ai_models","risk_level":"LOW","summary":"Kết hợp cảm biến với anomaly/forecasting/motion/vision mo')
+('vision_reason_mock', True, 200, '{"provider":"mock","latency_ms":0.02,"raw_llm_output":{"situation_summary":"Vision phát hiện vùng màu cam giống lửa nhưn')
