@@ -1,0 +1,82 @@
+
+
+===== PAGE 1 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+LAB 4 FORECASTING & PREDICTIVE ANALYTICS CHO DỮ LIỆU IoT Từ chuỗi telemetry lịch sử đến dự báo năng lượng, risk level, recommendation và API /forecast Thông tin Nội dung Học phần Triển khai, phát triển ứng dụng AI và IoT Vị trí Buổi 4 trong chuỗi AIoT Intelligence & Deployment Pipeline Thời lượng 03 tiết trên lớp + bài hoàn thiện theo nhóm Dataset mẫu UCI Appliances Energy Prediction Sản phẩm chính Notebook, model .joblib, forecast_metrics.json, forecast_log.csv, API /forecast  
+ Hình 1. Lab 3 phát hiện điều đang bất thường; Lab 4 dự báo điều có thể xảy ra. 
+I. Định vị Lab 4 trong lộ trình môn học Lab 4 nối trực tiếp sau Lab 3 nhưng không lặp lại bài toán anomaly detection. Ở Lab 3, sinh viên học cách biến model output thành event vận hành. Ở Lab 4, sinh viên học cách dùng chuỗi quá khứ để dự báo giá trị tương lai, sau đó chuyển forecast thành risk level và recommendation. Câu chốt để tránh nhầm: Lab 3 hỏi: hệ thống có đang bất thường không? Lab 4 hỏi: nếu xu hướng tiếp tục, giá trị sắp tới có thể là bao nhiêu và cần khuyến nghị gì?  
+
+
+===== PAGE 2 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+Lab/Buổi Vai trò Sản phẩm kế thừa hoặc tạo mới Lab 1 Thiết kế kiến trúc AIoT Use-case, dữ liệu, AI module, feedback loop Lab 2 IoT Data Preparation & Baseline Deployment Dataset sạch, feature dataset, baseline model, API /predict 
+Lab 3 Anomaly Detection & Event Intelligence anomaly_score, severity, anomaly_event_log.csv, API /detect-anomaly Lab 4 Forecasting & Predictive Analytics predicted_value, forecast_error, risk_level, recommendation, API /forecast Lab 5 AI Inference Service Đóng gói nhiều endpoint AI thành service hoàn chỉnh  
+II. Dẫn nhập thực tế Hãy tưởng tượng một smart home hoặc smart building đang ghi nhận năng lượng tiêu thụ của thiết bị gia dụng theo từng khoảng 10 phút. Ở thời điểm hiện tại, mức tiêu thụ có thể chưa vượt ngưỡng cảnh báo. Tuy nhiên, nếu xu hướng tăng tiếp tục trong vài bước tiếp theo, hệ thống có thể cần khuyến nghị giảm tải không thiết yếu, kiểm tra HVAC, hoặc nhắc người vận hành theo dõi sớm. Điểm cần nhấn mạnh: forecasting không phải để “đoán cho vui”. Trong AIoT, dự báo chỉ có giá trị khi nó đi tiếp sang risk level, recommendation, forecast log và safety rule. Thông điệp của Lab 4: Model chỉ trả predicted_value. Hệ thống AIoT cần thêm risk threshold, recommendation và safety note trước khi tác động đến thiết bị.  
+III. Mục tiêu sau lab • Phân biệt forecasting với anomaly detection và classification. • Hiểu dataset UCI Appliances Energy Prediction và target Appliances theo Wh. • Tạo lag feature, rolling feature, delta feature và time feature cho chuỗi thời gian. • Tạo target tương lai bằng cách shift target theo forecast horizon. • Chia train/test theo thời gian, không random split dữ liệu time-series. • Train Last Value, Moving Average, Linear Regression, Random Forest và một model boosting nâng cao. • Đánh giá bằng MAE, RMSE, MAPE và forecast bias. • Sinh forecast_log.csv có actual_value, predicted_value, forecast_error, risk_level và recommendation. • Deploy API /forecast và đọc response JSON theo hướng tích hợp hệ thống. • Giải thích vì sao forecast output không được dùng trực tiếp để tự động điều khiển thiết bị. 
+IV. Dataset public dùng trong bài mẫu Bài mẫu sử dụng UCI Appliances Energy Prediction. Dataset này phù hợp cho Lab 4 vì target là biến số liên tục, dữ liệu có timestamp, chu kỳ đo 10 phút và nhiều biến môi trường hỗ trợ bài toán dự báo năng lượng. 
+
+===== PAGE 3 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+Thành phần Mô tả Dataset UCI Appliances Energy Prediction File chính energydata_complete.csv Target Appliances - năng lượng thiết bị gia dụng trong mỗi khoảng 10 phút, đơn vị Wh Dữ liệu đầu vào date, lights, nhiệt độ/độ ẩm các phòng, thời tiết ngoài trời, áp suất, gió, visibility, dew point Forecast horizon trong code mẫu 1 bước thời gian = 10 phút Use-case AIoT ánh xạ Smart home/building energy forecasting, early energy-saving recommendation Lưu ý kỹ thuật rv1 và rv2 là biến ngẫu nhiên trong dataset; code loại khỏi feature để tránh nhiễu.  Ghi chú cho giảng viên: Project có cơ chế tải UCI official dataset nếu máy có Internet. Nếu không tải được, project dùng sample fallback cùng schema để sinh viên vẫn chạy được notebook, script và API. Khi chấm chính thức bằng UCI gốc, metric có thể khác kết quả kiểm thử trong tài liệu.  
+V. Lab 4: forecasting, không phải anomaly detection Nội dung Lab 3 - Anomaly Detection Lab 4 - Forecasting Câu hỏi Điểm/đoạn này có bất thường không? Giá trị tương lai sẽ là bao nhiêu? Input Telemetry hiện tại + lịch sử gần Chuỗi quá khứ, lag/rolling features, biến thời gian Target Nhãn anomaly hoặc pattern bình thường Appliances tại thời điểm t + horizon Output model anomaly_score, is_anomaly predicted_value Metric Precision, Recall, F1, Confusion Matrix MAE, RMSE, MAPE, forecast bias Decision layer event_type, severity, alert/safety decision risk_level, recommendation, safety note API /detect-anomaly /forecast  
+
+===== PAGE 4 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+VI. Pipeline Lab 4 
+ Hình 2. Pipeline Lab 4: từ UCI telemetry đến forecast, risk và API. Bước Tên bước Sinh viên làm gì Cần phân tích 1 Load dữ liệu Nạp UCI hoặc sample fallback. Dữ liệu có bao nhiêu dòng? Target là gì? 2 Visualize time-series Vẽ Appliances theo thời gian. Có chu kỳ/ngày/đỉnh tiêu thụ không? 
+3 Tạo feature Tạo hour, dayofweek, lag, rolling mean/std, delta. Vì sao phải dùng quá khứ để dự báo tương lai? 4 Tạo target tương lai target_future = Appliances.shift(-1). Target có bị rò rỉ vào feature không? 5 Train/test theo thời gian 75% đầu train, 25% cuối test. Vì sao không random split? 
+6 Baseline Last Value và Moving Average. Model ML có tốt hơn quy tắc đơn giản không? 7 Model ML Linear Regression, Random Forest. Sai số lớn xuất hiện ở thời đoạn nào? 8 Model nâng cao Gradient Boosting demo. Model phức tạp hơn có luôn thắng không? Vì sao? 9 Metric MAE, RMSE, MAPE, bias. RMSE cao hơn MAE nhiều gợi ý điều gì? 10 Decision layer Risk level và recommendation. Forecast khác decision như thế nào? 11 Deploy API Chạy /forecast. Test notebook khác deploy API ở điểm nào?  
+VII. Cấu trúc project code mẫu lab4_aiot_forecasting_predictive_analytics_uci_appliances/ ├─ data/ │  └─ sample_energydata_complete.csv ├─ notebooks/ │  └─ 01_forecasting_predictive_analytics.ipynb 
+
+
+===== PAGE 5 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+├─ src/ │  ├─ download_data.py │  ├─ train_forecast.py │  ├─ app.py │  ├─ test_api.py │  ├─ test_api_local.py │  ├─ plot_results.py │  └─ utils.py ├─ models/ ├─ outputs/ ├─ figures/ ├─ diagrams/ └─ requirements.txt   File/thư mục Sinh viên cần hiểu gì notebooks/ Nơi học từng bước: load data, feature, split, train, test, phân tích. src/train_forecast.py Script chạy nhanh toàn bộ train/test, so sánh baseline với model ML và model nâng cao. models/ Nơi lưu model bundle .joblib. API load model từ đây. outputs/ Nơi lưu metrics, forecast_test_predictions.csv, forecast_log.csv và api_test_result.json. src/app.py FastAPI service. Đây là bước deploy model thành endpoint /forecast. src/test_api_local.py Kiểm tra response schema không cần mở local port.  
+VIII. Hướng dẫn cài môi trường python -m venv .venv  # Windows .venv\Scripts\activate  # macOS/Linux source .venv/bin/activate  pip install -r requirements.txt   Dấu hiệu cài đặt thành công: Lệnh pip install không báo lỗi. Sau đó sinh viên có thể chạy python src/download_data.py hoặc mở notebook.  
+
+===== PAGE 6 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+IX. Lệnh chạy bài mẫu Cách 1: chạy notebook. jupyter notebook notebooks/01_forecasting_predictive_analytics.ipynb   Cách 2: chạy script kiểm tra nhanh. python src/download_data.py python src/train_forecast.py python src/plot_results.py python src/test_api_local.py   Kết quả mong đợi sau khi chạy script: models/forecast_model_bundle_v1.joblib outputs/forecast_metrics.json outputs/forecast_test_predictions.csv outputs/forecast_log.csv outputs/api_test_result.json figures/forecast_vs_actual.png figures/forecast_error_over_time.png figures/model_comparison_mae.png   
+X. Model trong Lab 4: baseline, ML và mở rộng Model Vai trò trong bài Mức yêu cầu Last Value Baseline Dự báo bước kế tiếp bằng giá trị hiện tại. Bắt buộc Moving Average Baseline Dự báo bằng trung bình gần nhất. Bắt buộc Linear Regression Model ML dễ giải thích, phù hợp sinh viên mới. Bắt buộc Random Forest Regressor Model phi tuyến mạnh hơn, vẫn vừa sức. Khá Gradient Boosting Regressor Model nâng cao trong code mẫu; cầu nối sang XGBoost/LightGBM. Giỏi/mở rộng LSTM/GRU hoặc multi-step forecasting Không bắt buộc; dùng cho nhóm rất khá nếu muốn đi sâu chuỗi thời gian. Mở rộng  Câu chốt: Model phức tạp hơn không mặc định tốt hơn. Sinh viên phải so sánh với baseline bằng metric và phân tích sai số theo thời gian.  
+
+===== PAGE 7 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+XI. Cách hiểu metric sau khi test model Metric Ý nghĩa dễ hiểu Cách đọc trong hệ thống AIoT MAE Sai số trung bình tuyệt đối. Dễ giải thích nhất: dự báo lệch trung bình bao nhiêu Wh. RMSE Phạt lỗi lớn mạnh hơn MAE. Nếu RMSE cao hơn MAE nhiều, model có một số lỗi lớn đáng chú ý. MAPE Sai số phần trăm. Dùng thận trọng khi giá trị thật gần 0. Forecast bias Sai số có dấu trung bình. Bias dương: hay dự báo cao; bias âm: hay dự báo thấp.  
+XII. Từ forecast output đến risk và recommendation API /forecast không nên chỉ trả một số. Response cần có model_output, evaluation_hint và decision để dashboard, event log hoặc service khác đọc được. {   "model_output": {     "target": "Appliances",     "forecast_horizon_minutes": 10,     "predicted_value": 99.04,     "unit": "Wh per 10-minute interval",     "model_version": "linear_regression_v1"   },   "decision": {     "risk_level": "WARNING",     "recommendation": "MONITOR_AND_PREPARE_ENERGY_SAVING_ACTION",     "reason": "Predicted appliance energy exceeds warning threshold",     "safety_note": "Forecast output is a recommendation signal, not an automatic actuator command."   } }   Trường trong forecast_log.csv Ý nghĩa timestamp Thời điểm dự báo trong tập test. actual_value Giá trị thật ở thời điểm tương lai. predicted_value Giá trị model dự báo. forecast_error predicted_value - actual_value. risk_level NORMAL, WARNING, HIGH hoặc CRITICAL. recommendation Khuyến nghị vận hành tương ứng với risk_level.  
+
+===== PAGE 8 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+XIII. Deploy API /forecast Sau khi đã train model, sinh viên chạy FastAPI: uvicorn src.app:app --reload   Mở trình duyệt: http://127.0.0.1:8000/docs   Mở terminal khác và test API: python src/test_api.py   Nếu máy không mở được local port, có thể test logic API bằng: python src/test_api_local.py   Dấu hiệu deploy thành công: Endpoint /health trả model_loaded: true. Endpoint /forecast trả JSON có predicted_value, risk_level, recommendation và safety_note.  
+XIV. Kết quả chạy thử trên gói mẫu Model Loại MAE RMSE MAPE (%) Bias last_value_baseline baseline 15.1358 28.3285 15.6447 -0.0874 moving_average_6_baseline baseline 22.1871 35.9803 25.0943 -0.2646 linear_regression_v1 Pipeline 13.2916 26.4976 15.7168 -0.0958 random_forest_v1 RandomForestRegressor 14.4224 27.1028 17.2894 1.0093 gradient_boosting_advanced_v1 GradientBoostingRegressor 14.5067 27.1723 17.4729 0.571  Model được deploy theo MAE trên lần chạy thử: linear_regression_v1. Forecast horizon: 10 phút. Số dòng sau feature engineering: 2975; train: 2231; test: 744. Không chấm theo con số metric cố định: Khi dùng UCI official dataset hoặc thay đổi horizon/feature, metric có thể khác. Điểm chính là sinh viên giải thích được baseline, lỗi dự báo, risk rule và safety. 
+
+===== PAGE 9 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+ 
+ Hình 3. Forecast vs actual trên tập test. 
+ Hình 4. Forecast error theo thời gian. 
+ 
+
+
+===== PAGE 10 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+Hình 5. So sánh model bằng MAE. 
+XV. Thực hành bắt buộc trên lớp Nhiệm vụ Yêu cầu tối thiểu Sản phẩm Chạy notebook Chạy từng cell, đọc phần giải thích sau mỗi bước. Notebook chạy không lỗi. Tạo feature forecasting Có lag, rolling, delta và time feature. Supervised table có target_future. Train/test model Có baseline và ít nhất một model ML. forecast_metrics.json, forecast_test_predictions.csv. Sinh forecast log Có risk_level, recommendation, reason. forecast_log.csv. Deploy API Chạy /health, /model-info, /forecast. Ảnh chụp hoặc log response JSON. Phân tích Trả lời câu hỏi phân tích hệ thống. Report ngắn 1-2 trang.  
+XVI. Yêu cầu phát triển theo nhóm Mức Yêu cầu Bắt buộc Chạy đúng bài mẫu, giải thích metric, sinh forecast_log.csv và test API /forecast. Khá Điều chỉnh horizon, chọn target khác hoặc ánh xạ sang use-case nhóm; so sánh Linear Regression với Random Forest. Giỏi Thêm XGBoost/LightGBM/LSTM, multi-step forecasting, prediction interval hoặc drift monitoring.  
+XVII. Câu hỏi phân tích sau lab 1. Lab 4 đang dự báo giá trị tương lai hay phát hiện bất thường? Giải thích bằng input, output và metric. 2. Vì sao forecasting cần lag feature? 3. Vì sao không random split dữ liệu time-series? 4. MAE và RMSE khác nhau thế nào? 5. Nếu RMSE cao hơn MAE nhiều, điều đó gợi ý gì về lỗi dự báo? 6. Model dự báo sai nhiều ở giai đoạn nào trong biểu đồ forecast_error_over_time? 7. Nếu predicted_value cao, hệ thống có nên tự động tắt thiết bị không? Vì sao? 8. Forecast output khác decision như thế nào? 9. Nếu model dự báo sai liên tục trong dữ liệu mới, nhóm sẽ xử lý thế nào? 10. Dashboard nên hiển thị gì ngoài predicted_value? 
+
+===== PAGE 11 =====
+Triển khai, phát triển ứng dụng AI và IoT | Lab 4 
+Lab 4 - Forecasting & Predictive Analytics 
+XVIII. Rubric chấm điểm Tiêu chí Mô tả Điểm Dữ liệu và target forecasting Dùng dataset đúng, hiểu timestamp, target Appliances và horizon. 1.5 Feature engineering thời gian Có lag, rolling, delta hoặc feature tương đương và giải thích được vai trò. 1.5 Train/test theo thời gian Chia đúng, tránh data leakage. 1.0 Model baseline và so sánh Có baseline đơn giản và ít nhất một model ML; có so sánh với model nâng cao. 1.5 Đánh giá metric Có MAE/RMSE/MAPE/bias và giải thích được ý nghĩa. 1.5 Forecast log và recommendation Có forecast_log.csv, risk_level, recommendation, reason. 1.0 Deploy API /forecast API chạy được, response JSON đúng cấu trúc. 1.0 Phân tích hệ thống và safety Giải thích khi nào không tự động điều khiển. 1.0 Tổng  10.0  
+XIX. Sản phẩm up GitHub • File notebook đã chạy hoặc ảnh chụp các cell quan trọng. • Source code project. • outputs/forecast_metrics.json. • outputs/forecast_log.csv. • outputs/api_test_result.json. • Ảnh biểu đồ trong thư mục figures/. • Ảnh chụp API /health và /forecast. • Report ngắn 1-2 trang trả lời câu hỏi phân tích. 
+Tài liệu tham khảo • UCI Machine Learning Repository: Appliances Energy Prediction. https://archive.ics.uci.edu/dataset/374/appliances+energy+prediction • Candanedo, L. M., Feldheim, V., & Deramaix, D. (2017). Data driven prediction models of energy use of appliances in a low-energy house. Energy and Buildings, 140, 81-97. • scikit-learn LinearRegression, RandomForestRegressor and GradientBoostingRegressor documentation. • FastAPI documentation. https://fastapi.tiangolo.com/ 

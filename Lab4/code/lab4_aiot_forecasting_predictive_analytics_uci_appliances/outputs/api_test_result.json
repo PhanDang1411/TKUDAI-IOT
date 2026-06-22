@@ -1,0 +1,102 @@
+{
+  "health": {
+    "status": "ok",
+    "model_loaded": true,
+    "model_bundle_path": "D:\\Work\\HocKy3\\Deploying-AI-and-IoT-applications\\Lab4\\code\\lab4_aiot_forecasting_predictive_analytics_uci_appliances\\models\\forecast_model_bundle_v1.joblib"
+  },
+  "model_info": {
+    "model_loaded": true,
+    "model_name": "Pipeline",
+    "model_version": "linear_regression_v1",
+    "target": "Appliances",
+    "forecast_horizon_minutes": 10,
+    "input": "history of UCI Appliances telemetry rows",
+    "output": "predicted_value, risk_level, recommendation, safety_note",
+    "feature_count": 49,
+    "risk_thresholds": {
+      "warning": 90.0,
+      "high": 210.0,
+      "critical": 400.0
+    },
+    "metrics": {
+      "dataset_rows_after_feature_engineering": 19710,
+      "train_rows": 14782,
+      "test_rows": 4928,
+      "target": "Appliances",
+      "forecast_horizon_steps": 1,
+      "forecast_horizon_minutes": 10,
+      "split_policy": "Chronological split: first 75% train, last 25% test. No random split.",
+      "feature_policy": "Use current and historical lag/rolling features only; target_future is shifted after feature creation.",
+      "best_model_name": "linear_regression_v1",
+      "risk_thresholds_from_training_target": {
+        "warning": 90.0,
+        "high": 210.0,
+        "critical": 400.0
+      },
+      "metrics_by_model": {
+        "last_value_baseline": {
+          "mae": 25.7812,
+          "rmse": 64.4874,
+          "mape_percent": 21.8438,
+          "forecast_bias": -0.067,
+          "model_type": "baseline"
+        },
+        "moving_average_6_baseline": {
+          "mae": 33.7003,
+          "rmse": 74.0469,
+          "mape_percent": 29.496,
+          "forecast_bias": -0.0822,
+          "model_type": "baseline"
+        },
+        "linear_regression_v1": {
+          "mae": 27.4157,
+          "rmse": 58.1258,
+          "mape_percent": 27.2872,
+          "forecast_bias": 2.5689,
+          "model_type": "Pipeline"
+        },
+        "random_forest_v1": {
+          "mae": 40.1542,
+          "rmse": 71.6956,
+          "mape_percent": 41.6192,
+          "forecast_bias": 22.4595,
+          "model_type": "RandomForestRegressor"
+        },
+        "gradient_boosting_advanced_v1": {
+          "mae": 39.469,
+          "rmse": 66.3544,
+          "mape_percent": 45.8698,
+          "forecast_bias": 21.3498,
+          "model_type": "GradientBoostingRegressor"
+        }
+      },
+      "interpretation_note": "MAE/RMSE/MAPE measure numerical forecast error. They are not classification metrics like Precision/Recall/F1 used in anomaly detection.",
+      "safety_note": "Forecast output is not an actuator command. It must pass risk rule, recommendation and human/safety confirmation before device control."
+    }
+  },
+  "forecast": {
+    "model_output": {
+      "target": "Appliances",
+      "forecast_horizon_minutes": 10,
+      "predicted_value": 329.1434,
+      "unit": "Wh per 10-minute interval",
+      "model_version": "linear_regression_v1"
+    },
+    "evaluation_hint": {
+      "metrics_file": "outputs/forecast_metrics.json",
+      "best_model_mae": 27.4157,
+      "best_model_rmse": 58.1258
+    },
+    "decision": {
+      "risk_level": "HIGH",
+      "recommendation": "REDUCE_NON_CRITICAL_LOAD_OR_CHECK_HVAC",
+      "reason": "Predicted appliance energy is 329.14 Wh; warning/high/critical thresholds are 90.00/210.00/400.00 Wh.",
+      "safety_note": "Forecast output is a recommendation signal, not an automatic actuator command. Apply safety rules and human confirmation before control."
+    },
+    "api_check": {
+      "latency_ms": 16.23,
+      "input_points": 36,
+      "warnings": []
+    }
+  }
+}

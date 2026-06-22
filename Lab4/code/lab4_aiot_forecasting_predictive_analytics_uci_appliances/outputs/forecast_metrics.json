@@ -1,0 +1,55 @@
+{
+  "dataset_rows_after_feature_engineering": 19710,
+  "train_rows": 14782,
+  "test_rows": 4928,
+  "target": "Appliances",
+  "forecast_horizon_steps": 1,
+  "forecast_horizon_minutes": 10,
+  "split_policy": "Chronological split: first 75% train, last 25% test. No random split.",
+  "feature_policy": "Use current and historical lag/rolling features only; target_future is shifted after feature creation.",
+  "best_model_name": "linear_regression_v1",
+  "risk_thresholds_from_training_target": {
+    "warning": 90.0,
+    "high": 210.0,
+    "critical": 400.0
+  },
+  "metrics_by_model": {
+    "last_value_baseline": {
+      "mae": 25.7812,
+      "rmse": 64.4874,
+      "mape_percent": 21.8438,
+      "forecast_bias": -0.067,
+      "model_type": "baseline"
+    },
+    "moving_average_6_baseline": {
+      "mae": 33.7003,
+      "rmse": 74.0469,
+      "mape_percent": 29.496,
+      "forecast_bias": -0.0822,
+      "model_type": "baseline"
+    },
+    "linear_regression_v1": {
+      "mae": 27.4157,
+      "rmse": 58.1258,
+      "mape_percent": 27.2872,
+      "forecast_bias": 2.5689,
+      "model_type": "Pipeline"
+    },
+    "random_forest_v1": {
+      "mae": 40.1542,
+      "rmse": 71.6956,
+      "mape_percent": 41.6192,
+      "forecast_bias": 22.4595,
+      "model_type": "RandomForestRegressor"
+    },
+    "gradient_boosting_advanced_v1": {
+      "mae": 39.469,
+      "rmse": 66.3544,
+      "mape_percent": 45.8698,
+      "forecast_bias": 21.3498,
+      "model_type": "GradientBoostingRegressor"
+    }
+  },
+  "interpretation_note": "MAE/RMSE/MAPE measure numerical forecast error. They are not classification metrics like Precision/Recall/F1 used in anomaly detection.",
+  "safety_note": "Forecast output is not an actuator command. It must pass risk rule, recommendation and human/safety confirmation before device control."
+}
