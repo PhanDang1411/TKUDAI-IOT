@@ -1,0 +1,6 @@
+{
+  "target": "temperature",
+  "current_value": 34.0,
+  "recent_values": [27.1, 27.3, 27.2, 27.4, 27.5],
+  "threshold_z": 2.5
+}

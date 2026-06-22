@@ -1,0 +1,9 @@
+GET /health 200 PASS
+GET /model-info 200 PASS
+POST /detect-anomaly 200 PASS
+POST /forecast 200 PASS
+GET /vision/model-info 200 PASS
+GET /classify-image-demo 200 PASS
+LOCAL_PIPELINE_TEST_PASS
+---
+Mon Jun  8 07:23:25 UTC 2026

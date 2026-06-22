@@ -1,0 +1,15 @@
+services:
+  aiot-api:
+    build: .
+    container_name: lab5-aiot-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_DIR=/app/models
+      - OUTPUT_DIR=/app/outputs
+      - VISION_MODEL_PATH=/app/models/vision/squeezenet1.1-7.onnx
+      - VISION_LABELS_PATH=/app/models/vision/imagenet_classes.txt
+    volumes:
+      - ./outputs:/app/outputs
+      - ./models/vision:/app/models/vision
+    restart: unless-stopped
